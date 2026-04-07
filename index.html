@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clip Cents — Where Creators Meet Clippers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #050505;
+    --surface: #0a0a0a;
+    --surface-2: #111111;
+    --border: #1a1a1a;
+    --border-hover: #2a2a2a;
+    --text-primary: #f5f5f7;
+    --text-secondary: #86868b;
+    --text-tertiary: #6e6e73;
+    --accent: #c8ff00;
+    --accent-dim: rgba(200, 255, 0, 0.08);
+    --accent-glow: rgba(200, 255, 0, 0.15);
+    --gradient-1: linear-gradient(135deg, #c8ff00 0%, #a0e000 100%);
+    --red: #ff4444;
+    --red-dim: rgba(255, 68, 68, 0.08);
+    --red-border: rgba(255, 68, 68, 0.12);
+    --font-display: 'Outfit', -apple-system, sans-serif;
+    --font-body: 'DM Sans', -apple-system, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+  body { background: var(--bg); color: var(--text-primary); font-family: var(--font-body); overflow-x: hidden; line-height: 1.6; }
+
+  /* ─── Ambient ─── */
+  .ambient { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .ambient::before {
+    content: ''; position: absolute; width: 800px; height: 800px; top: -200px; left: 50%; transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(200,255,0,0.04) 0%, transparent 70%);
+    animation: ambientPulse 8s ease-in-out infinite;
+  }
+  @keyframes ambientPulse {
+    0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+  }
+
+  /* ─── Nav ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 20px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%);
+    background: rgba(5,5,5,0.7); border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; }
+  .nav-logo .dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 12px var(--accent-glow); }
+  .nav-cta {
+    font-size: 0.85rem; font-weight: 500; padding: 10px 24px; border-radius: 100px;
+    border: 1px solid var(--border); background: transparent; color: var(--text-primary);
+    cursor: pointer; transition: all 0.3s ease; text-decoration: none;
+  }
+  .nav-cta:hover { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+
+  /* ─── Hero ─── */
+  .hero {
+    position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center; padding: 140px 24px 80px;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; border-radius: 100px;
+    border: 1px solid var(--border); background: var(--surface); font-size: 0.8rem; font-weight: 500;
+    color: var(--text-secondary); margin-bottom: 40px;
+    opacity: 0; animation: fadeUp 0.8s ease forwards 0.2s;
+  }
+  .hero-badge .pulse { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(200,255,0,0.4); }
+    50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(200,255,0,0); }
+  }
+
+  .hero h1 {
+    font-family: var(--font-display); font-size: clamp(3rem, 8vw, 6.5rem); font-weight: 700;
+    letter-spacing: -0.04em; line-height: 1.05; max-width: 900px;
+    opacity: 0; animation: fadeUp 0.8s ease forwards 0.4s;
+  }
+  .hero h1 .accent { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2vw, 1.25rem); font-weight: 300; color: var(--text-secondary);
+    max-width: 540px; margin-top: 28px; line-height: 1.7;
+    opacity: 0; animation: fadeUp 0.8s ease forwards 0.6s;
+  }
+
+  /* ─── Role Toggle ─── */
+  .role-toggle-wrapper {
+    display: flex; flex-direction: column; align-items: center; margin-top: 40px;
+    opacity: 0; animation: fadeUp 0.8s ease forwards 0.7s;
+  }
+  .role-prompt {
+    font-family: var(--font-display); font-size: 0.85rem; font-weight: 500;
+    color: var(--text-secondary); margin-bottom: 16px;
+    animation: blinkText 2s ease-in-out infinite;
+  }
+  @keyframes blinkText {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .role-toggle {
+    display: flex; gap: 0; border-radius: 18px; border: 1px solid var(--border);
+    background: var(--surface); padding: 5px;
+    transition: all 0.4s ease;
+  }
+  .role-toggle.awaiting {
+    animation: borderPulse 2s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(200,255,0,0.06);
+  }
+  @keyframes borderPulse {
+    0%, 100% { border-color: var(--border); box-shadow: 0 0 0px rgba(200,255,0,0); }
+    50% { border-color: rgba(200,255,0,0.35); box-shadow: 0 0 24px rgba(200,255,0,0.08); }
+  }
+  .role-toggle.chosen { animation: none; border-color: var(--border); box-shadow: none; }
+  .role-btn {
+    padding: 16px 44px; border-radius: 14px; border: none; background: transparent;
+    color: var(--text-tertiary); font-family: var(--font-display); font-weight: 600;
+    font-size: 1.05rem; cursor: pointer; transition: all 0.3s ease;
+  }
+  .role-btn.active { background: var(--accent); color: #050505; box-shadow: 0 2px 16px rgba(200,255,0,0.2); }
+  .role-btn:not(.active):hover { color: var(--text-secondary); background: rgba(255,255,255,0.03); }
+
+  /* ─── Content hidden until role chosen ─── */
+  .gated { opacity: 0; transform: translateY(30px); pointer-events: none; transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+  .gated.revealed { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+  /* ─── Hero Form ─── */
+  .hero-form {
+    display: flex; gap: 12px; margin-top: 16px;
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s;
+  }
+  .hero-form.visible { opacity: 1; transform: translateY(0); }
+  .hero-form input, .bottom-form input {
+    width: 320px; padding: 16px 24px; border-radius: 14px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text-primary); font-family: var(--font-body);
+    font-size: 0.95rem; outline: none; transition: all 0.3s ease;
+  }
+  .hero-form input::placeholder, .bottom-form input::placeholder { color: var(--text-tertiary); }
+  .hero-form input:focus, .bottom-form input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+  .hero-form button, .bottom-form button {
+    padding: 16px 36px; border-radius: 14px; border: none; background: var(--accent); color: #050505;
+    font-family: var(--font-display); font-weight: 600; font-size: 0.95rem; cursor: pointer;
+    transition: all 0.3s ease; white-space: nowrap;
+  }
+  .hero-form button:hover, .bottom-form button:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(200,255,0,0.25); }
+
+  .hero-note {
+    margin-top: 16px; font-size: 0.78rem; color: var(--text-tertiary);
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+  }
+  .hero-note.visible { opacity: 1; transform: translateY(0); }
+  .success-msg, .bottom-success {
+    display: none; padding: 20px 32px; border-radius: 14px; border: 1px solid rgba(200,255,0,0.2);
+    background: var(--accent-dim); color: var(--accent); font-weight: 500; font-size: 1rem;
+    animation: fadeUp 0.5s ease forwards;
+  }
+  .success-msg { margin-top: 48px; }
+  .bottom-success { margin: 20px auto 0; max-width: 400px; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ─── Divider ─── */
+  .divider { width: 100%; max-width: 1200px; margin: 0 auto; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); }
+
+  /* ─── Sections ─── */
+  .section { position: relative; z-index: 1; padding: 120px 24px; }
+  .section-label {
+    font-family: var(--font-display); font-size: 0.75rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); text-align: center; margin-bottom: 20px;
+  }
+  .section-title {
+    font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700;
+    letter-spacing: -0.03em; text-align: center; max-width: 700px; margin: 0 auto 16px; line-height: 1.1;
+  }
+  .section-sub { font-size: 1.1rem; font-weight: 300; color: var(--text-secondary); text-align: center; max-width: 500px; margin: 0 auto 72px; }
+
+  /* ─── Value Props Grid ─── */
+  .value-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1000px; margin: 0 auto; }
+  .value-card {
+    border: 1px solid var(--border); border-radius: 20px; padding: 40px 32px; background: var(--surface);
+    transition: all 0.4s ease; position: relative; overflow: hidden;
+  }
+  .value-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0; transition: opacity 0.4s ease;
+  }
+  .value-card:hover { border-color: var(--border-hover); transform: translateY(-4px); }
+  .value-card:hover::before { opacity: 1; }
+  .value-icon {
+    width: 48px; height: 48px; border-radius: 14px; background: var(--accent-dim);
+    border: 1px solid rgba(200,255,0,0.1); display: flex; align-items: center;
+    justify-content: center; margin-bottom: 24px;
+  }
+  .value-card h3 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 12px; }
+  .value-card p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; font-weight: 300; }
+
+  /* ─── Problems / Solutions ─── */
+  .ps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1000px; margin: 0 auto; }
+  .ps-card { padding: 36px 32px; border-radius: 20px; position: relative; overflow: hidden; transition: all 0.3s ease; }
+  .ps-card.problem { border: 1px solid var(--border); background: var(--surface); }
+  .ps-card.solution { border: 1px solid rgba(200,255,0,0.1); background: linear-gradient(135deg, rgba(200,255,0,0.03) 0%, transparent 100%); }
+  .ps-card:hover.problem { border-color: var(--border-hover); }
+  .ps-card:hover.solution { border-color: rgba(200,255,0,0.2); }
+  .ps-icon {
+    width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; margin-bottom: 20px;
+  }
+  .ps-icon.red { background: var(--red-dim); border: 1px solid var(--red-border); }
+  .ps-icon.green { background: var(--accent-dim); border: 1px solid rgba(200,255,0,0.12); }
+  .ps-tag { font-family: var(--font-display); font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; }
+  .ps-tag.red { color: var(--red); }
+  .ps-tag.green { color: var(--accent); }
+  .ps-card h4 { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 10px; }
+  .ps-card p { font-size: 0.88rem; color: var(--text-tertiary); line-height: 1.65; font-weight: 300; }
+  .ps-card.solution p { color: var(--text-secondary); }
+
+  .solution-arrow { text-align: center; padding: 48px 24px; position: relative; z-index: 1; }
+  .solution-arrow svg { opacity: 0.3; }
+
+  /* ─── Stats ─── */
+  .stats { display: flex; justify-content: center; gap: 80px; padding: 80px 24px; position: relative; z-index: 1; }
+  .stat { text-align: center; }
+  .stat-num { font-family: var(--font-display); font-size: 3rem; font-weight: 700; letter-spacing: -0.03em; }
+  .stat-num .accent { color: var(--accent); }
+  .stat-label { font-size: 0.85rem; color: var(--text-tertiary); margin-top: 8px; }
+
+  /* ─── Steps ─── */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: 1000px; margin: 0 auto; }
+  .step { text-align: center; padding: 40px 28px; }
+  .step-num {
+    font-family: var(--font-display); font-size: 4rem; font-weight: 700; line-height: 1; margin-bottom: 20px;
+    background: linear-gradient(180deg, var(--text-tertiary), var(--surface-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .step h4 { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; margin-bottom: 12px; }
+  .step p { font-size: 0.9rem; color: var(--text-tertiary); line-height: 1.6; font-weight: 300; }
+
+  /* ─── Bottom CTA ─── */
+  .bottom-cta { position: relative; z-index: 1; text-align: center; padding: 120px 24px 140px; }
+  .bottom-cta h2 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 20px; }
+  .bottom-cta p.cta-sub { color: var(--text-secondary); font-size: 1.05rem; font-weight: 300; margin-bottom: 40px; }
+  .bottom-form { display: flex; gap: 12px; justify-content: center; }
+
+  /* ─── Footer ─── */
+  footer { position: relative; z-index: 1; text-align: center; padding: 40px 24px; border-top: 1px solid var(--border); color: var(--text-tertiary); font-size: 0.8rem; }
+  footer a { color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+  footer a:hover { color: var(--accent); }
+
+  /* ─── Scroll reveal ─── */
+  .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ─── Dynamic content transitions ─── */
+  .dynamic { transition: opacity 0.35s ease, transform 0.35s ease; }
+  .dynamic.switching { opacity: 0; transform: translateY(8px); }
+
+  /* ─── Mobile ─── */
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .hero { padding: 120px 20px 60px; }
+    .hero-form, .bottom-form { flex-direction: column; align-items: center; }
+    .hero-form input, .hero-form button, .bottom-form input, .bottom-form button { width: 100%; max-width: 360px; }
+    .value-grid { grid-template-columns: 1fr; }
+    .ps-grid { grid-template-columns: 1fr; }
+    .ps-card { padding: 28px 24px; }
+    .stats { flex-direction: column; gap: 40px; }
+    .steps { grid-template-columns: 1fr; gap: 16px; }
+    .step { padding: 28px 20px; }
+    .role-btn { padding: 14px 28px; font-size: 0.95rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ambient"></div>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-logo"><span class="dot"></span> Clip Cents</div>
+  <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge"><span class="pulse"></span> Coming Soon</div>
+  <h1 id="hero-headline" class="dynamic">Content clipped.<br><span class="accent">Revenue shared.</span></h1>
+  <p class="hero-sub dynamic" id="hero-sub">The marketplace that connects creators with expert clippers. Fair pay, transparent revenue sharing, and tools built for both sides.</p>
+  <div class="role-toggle-wrapper" id="hero-role-wrapper">
+    <p class="role-prompt" id="role-prompt">Choose your side to get started</p>
+    <div class="role-toggle awaiting" id="hero-role-toggle">
+      <button class="role-btn" data-role="creator" onclick="switchRole('creator')">I'm a Creator</button>
+      <button class="role-btn" data-role="clipper" onclick="switchRole('clipper')">I'm a Clipper</button>
+    </div>
+  </div>
+  <div class="hero-form" id="waitlist">
+    <input type="email" id="hero-email" placeholder="Enter your email" required>
+    <button onclick="submitForm('hero')">Join the Waitlist</button>
+  </div>
+  <p class="hero-note" id="hero-note">Be first in line. No spam, ever.</p>
+  <div class="success-msg" id="hero-success">You're on the list. We'll be in touch soon.</div>
+</section>
+
+<!-- Everything below is gated until role is chosen -->
+<div id="gated-content" class="gated">
+
+<div class="divider"></div>
+
+<!-- Value Props -->
+<section class="section">
+  <div class="reveal">
+    <p class="section-label dynamic" id="value-label"></p>
+    <h2 class="section-title dynamic" id="value-title"></h2>
+    <p class="section-sub dynamic" id="value-sub"></p>
+  </div>
+  <div class="value-grid reveal dynamic" id="value-grid"></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Pain Points -->
+<section class="section">
+  <div class="reveal">
+    <p class="section-label dynamic" style="color: var(--red);" id="problem-label"></p>
+    <h2 class="section-title dynamic" id="problem-title"></h2>
+    <p class="section-sub dynamic" id="problem-sub"></p>
+  </div>
+  <div class="ps-grid reveal dynamic" id="problem-grid"></div>
+
+  <div class="solution-arrow reveal">
+    <svg width="40" height="60" viewBox="0 0 40 60" fill="none" stroke="#c8ff00" stroke-width="2" stroke-linecap="round"><path d="M20 0v50m-12-12l12 12 12-12"/></svg>
+  </div>
+
+  <div class="reveal">
+    <p class="section-label">The Clip Cents Way</p>
+    <h2 class="section-title dynamic" id="solution-title"></h2>
+  </div>
+  <div class="ps-grid reveal dynamic" id="solution-grid" style="margin-top: 48px;"></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Stats -->
+<section class="stats reveal dynamic" id="stats-section"></section>
+
+<div class="divider"></div>
+
+<!-- How It Works -->
+<section class="section">
+  <div class="reveal">
+    <p class="section-label">How It Works</p>
+    <h2 class="section-title">Three steps. Zero complexity.</h2>
+  </div>
+  <div class="steps reveal dynamic" id="steps-grid"></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Bottom CTA -->
+<section class="bottom-cta reveal">
+  <h2 class="dynamic" id="bottom-headline"></h2>
+  <p class="cta-sub dynamic" id="bottom-sub"></p>
+  <div class="bottom-form">
+    <input type="email" id="bottom-email" placeholder="Enter your email">
+    <button onclick="submitForm('bottom')">Join the Waitlist</button>
+  </div>
+  <div class="bottom-success" id="bottom-success">You're on the list. We'll be in touch soon.</div>
+</section>
+
+</div><!-- end #gated-content -->
+
+<footer>
+  <p>&copy; 2026 Clip Cents. All rights reserved. &nbsp;·&nbsp; <a href="https://x.com/ClipCents" target="_blank">@ClipCents</a></p>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════
+// CONTENT DATABASE — all role-specific copy lives here
+// ═══════════════════════════════════════════════
+const content = {
+  creator: {
+    heroHeadline: 'Content clipped.<br><span class="accent">Revenue shared.</span>',
+    heroSub: "The marketplace that connects you with expert clippers. Your long-form content, repurposed into scroll-stopping clips — with fair, transparent revenue sharing.",
+    valueLabel: "Why Creators Choose Clip Cents",
+    valueTitle: "Stop leaving views<br>on the table.",
+    valueSub: "Your long-form content is a goldmine. Let expert clippers unlock it.",
+    values: [
+      { icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c8ff00" stroke-width="1.5" stroke-linecap="round"><path d="M15 10l-4 4l6 6l4-16l-18 7l4 2l2 6l3-4"/></svg>`,
+        title: "Clips that actually convert",
+        desc: "Vetted clippers who understand your niche create scroll-stopping shorts that drive real followers, not just views." },
+      { icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c8ff00" stroke-width="1.5" stroke-linecap="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>`,
+        title: "Pay only for performance",
+        desc: "No upfront retainers or monthly fees. Revenue sharing means clippers earn when you earn — aligned incentives from day one." },
+      { icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c8ff00" stroke-width="1.5" stroke-linecap="round"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`,
+        title: "Full rights control",
+        desc: "Approve every clip before it goes live. Set guidelines, manage permissions, and maintain full control over your brand." }
+    ],
+    problemLabel: "The Creator Problem",
+    problemTitle: "Growing on short-form<br>shouldn't be this hard.",
+    problemSub: "You know clips drive growth, but the current options are broken.",
+    problems: [
+      { title: "Hiring editors is expensive and slow", desc: "A good short-form editor costs $2K–$10K/month. You're either overpaying for a retainer or spending hours managing freelancers." },
+      { title: "No quality control on current platforms", desc: "Existing platforms flood you with low-effort clips. No vetting, no brand alignment — just volume-over-quality farming that can hurt your reputation." },
+      { title: "You can't track what's actually working", desc: "Clips go out across dozens of accounts and you have no centralized way to see which clippers perform, which formats convert, or what's driving real growth." },
+      { title: "Copyright and brand risk is on you", desc: "Clips get posted to random accounts with no oversight. If something goes wrong — a bad edit, a controversial cut — it's your name attached to it." }
+    ],
+    solutionTitle: "Your content, your rules,<br>your growth.",
+    solutions: [
+      { title: "Vetted clippers matched to your niche", desc: "Every clipper has a verified profile with stats, ratings, and portfolio samples. You see their track record before approving a single clip." },
+      { title: "Approve before anything goes live", desc: "Full review workflow — preview clips, request edits, and approve final versions before they hit any platform. Your brand stays protected." },
+      { title: "Centralized analytics dashboard", desc: "See every clip, every clipper, every view — all in one place. Know exactly what's working and double down on your best performers." },
+      { title: "Built-in rights management", desc: "Clear permission frameworks, documented agreements, and automated takedown tools. No more legal gray areas." }
+    ],
+    stats: [
+      { num: '10<span class="accent">x</span>', label: "more reach from short-form clips" },
+      { num: '73<span class="accent">%</span>', label: "of creators want help repurposing content" },
+      { num: '<span class="accent">$</span>0', label: "upfront — pay only on performance" }
+    ],
+    steps: [
+      { num: "01", title: "Post your content", desc: "Upload long-form videos and set your niche, style guidelines, and budget." },
+      { num: "02", title: "Clippers apply", desc: "Vetted clippers matched to your niche create clips for your review and approval." },
+      { num: "03", title: "Grow on autopilot", desc: "Approved clips go live, views roll in, and you only pay for results." }
+    ],
+    bottomHeadline: "Ready to scale your reach?",
+    bottomSub: "Join the waitlist and get early access when we launch."
+  },
+
+  clipper: {
+    heroHeadline: 'Your clips.<br><span class="accent">Your earnings.</span>',
+    heroSub: "The marketplace that actually pays you. Find campaigns, clip content, and earn what you deserve — with escrow-protected payments and a reputation you own.",
+    valueLabel: "Why Clippers Choose Clip Cents",
+    valueTitle: "Your skills deserve<br>real pay.",
+    valueSub: "Stop grinding on broken platforms. Build a career that lasts.",
+    values: [
+      { icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c8ff00" stroke-width="1.5" stroke-linecap="round"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`,
+        title: "Escrow-protected campaigns",
+        desc: "Creator funds are locked before you start clipping. When views are verified, you get paid automatically. No more empty budget pools." },
+      { icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c8ff00" stroke-width="1.5" stroke-linecap="round"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`,
+        title: "Fast, fair payouts",
+        desc: "Low-fee payments that actually reach you. No frozen accounts, no surprise minimums, no waiting weeks for money you already earned." },
+      { icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c8ff00" stroke-width="1.5" stroke-linecap="round"><path d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/></svg>`,
+        title: "Portable reputation",
+        desc: "Build a verified profile with stats, ratings, and a portfolio. Your track record follows you across every campaign — it's your asset." }
+    ],
+    problemLabel: "The Clipper Problem",
+    problemTitle: "Clipping is broken.<br>You already know it.",
+    problemSub: "Current platforms exploit your work. We've heard the complaints.",
+    problems: [
+      { title: "Scammed out of your earnings", desc: "Campaign owners reject clips without reason, ban accounts before payout, and platforms tell you to \"contact the creator directly.\" Your work, their profit." },
+      { title: "Budget pools run dry before you're paid", desc: "Campaigns have limited bounties. If the money runs out before your views are verified, you earn nothing — even with millions of views." },
+      { title: "Payments are slow and unreliable", desc: "High cross-border fees, frozen PayPal accounts, minimum withdrawal thresholds, and delays that stretch for weeks. The best clippers leave for whoever pays fastest." },
+      { title: "No reputation and no protection", desc: "Get banned? You lose everything. No portable track record, no dispute resolution, and copyright strikes hit your account — never the creator's." }
+    ],
+    solutionTitle: "Built to protect the people<br>who do the work.",
+    solutions: [
+      { title: "Escrow-protected payments", desc: "Creator funds are locked before the campaign starts. When views hit, you get paid automatically. No more empty pools or surprise rejections." },
+      { title: "Real dispute resolution", desc: "Not \"contact the creator yourself.\" An actual mediation process where both sides are heard, with transparent decisions and documented outcomes." },
+      { title: "Fast payouts, low fees", desc: "No frozen accounts, no surprise minimums, no waiting weeks. Your money reaches you quickly regardless of where you are in the world." },
+      { title: "Your reputation is yours", desc: "Build a verified clipper profile with stats, ratings, and a portfolio that follows you across every campaign. Your track record is your asset." }
+    ],
+    stats: [
+      { num: '<span class="accent">$</span>3', label: "average CPM on top campaigns" },
+      { num: '50<span class="accent">+</span>', label: "clips/day with the right workflow" },
+      { num: '0<span class="accent">%</span>', label: "of earnings lost to scam rejections" }
+    ],
+    steps: [
+      { num: "01", title: "Browse campaigns", desc: "Find escrow-backed campaigns that match your niche and editing style." },
+      { num: "02", title: "Clip & submit", desc: "Create scroll-stopping clips and submit them for creator approval." },
+      { num: "03", title: "Get paid reliably", desc: "Views are verified, funds release from escrow, and your reputation grows with every clip." }
+    ],
+    bottomHeadline: "Ready to get paid for real?",
+    bottomSub: "Join the waitlist and never worry about missing a payout again."
+  }
+};
+
+// ═══════════════════════════════════════════════
+// RENDER HELPERS
+// ═══════════════════════════════════════════════
+const iconProblem = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff4444" stroke-width="1.5" stroke-linecap="round"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+const iconSolution = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c8ff00" stroke-width="1.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>`;
+
+const render = {
+  values: (r) => content[r].values.map(v => `
+    <div class="value-card">
+      <div class="value-icon">${v.icon}</div>
+      <h3>${v.title}</h3>
+      <p>${v.desc}</p>
+    </div>`).join(''),
+
+  problems: (r) => content[r].problems.map(p => `
+    <div class="ps-card problem">
+      <div class="ps-icon red">${iconProblem}</div>
+      <p class="ps-tag red">The Problem</p>
+      <h4>${p.title}</h4>
+      <p>${p.desc}</p>
+    </div>`).join(''),
+
+  solutions: (r) => content[r].solutions.map(s => `
+    <div class="ps-card solution">
+      <div class="ps-icon green">${iconSolution}</div>
+      <p class="ps-tag green">Our Solution</p>
+      <h4>${s.title}</h4>
+      <p>${s.desc}</p>
+    </div>`).join(''),
+
+  stats: (r) => content[r].stats.map(s => `
+    <div class="stat">
+      <div class="stat-num">${s.num}</div>
+      <div class="stat-label">${s.label}</div>
+    </div>`).join(''),
+
+  steps: (r) => content[r].steps.map(s => `
+    <div class="step">
+      <div class="step-num">${s.num}</div>
+      <h4>${s.title}</h4>
+      <p>${s.desc}</p>
+    </div>`).join('')
+};
+
+// ═══════════════════════════════════════════════
+// ROLE SWITCHING
+// ═══════════════════════════════════════════════
+let currentRole = null;
+let hasChosen = false;
+
+function applyContent(role) {
+  const d = content[role];
+  document.getElementById('hero-headline').innerHTML = d.heroHeadline;
+  document.getElementById('hero-sub').textContent = d.heroSub;
+  document.getElementById('value-label').textContent = d.valueLabel;
+  document.getElementById('value-title').innerHTML = d.valueTitle;
+  document.getElementById('value-sub').textContent = d.valueSub;
+  document.getElementById('value-grid').innerHTML = render.values(role);
+  document.getElementById('problem-label').textContent = d.problemLabel;
+  document.getElementById('problem-title').innerHTML = d.problemTitle;
+  document.getElementById('problem-sub').textContent = d.problemSub;
+  document.getElementById('problem-grid').innerHTML = render.problems(role);
+  document.getElementById('solution-title').innerHTML = d.solutionTitle;
+  document.getElementById('solution-grid').innerHTML = render.solutions(role);
+  document.getElementById('stats-section').innerHTML = render.stats(role);
+  document.getElementById('steps-grid').innerHTML = render.steps(role);
+  document.getElementById('bottom-headline').textContent = d.bottomHeadline;
+  document.getElementById('bottom-sub').textContent = d.bottomSub;
+}
+
+function revealGatedContent() {
+  // Show hero form and note
+  document.querySelector('.hero-form').classList.add('visible');
+  document.getElementById('hero-note').classList.add('visible');
+
+  // Reveal all gated content
+  setTimeout(() => {
+    document.getElementById('gated-content').classList.add('revealed');
+  }, 200);
+
+  // Stop toggle blinking
+  const toggle = document.getElementById('hero-role-toggle');
+  toggle.classList.remove('awaiting');
+  toggle.classList.add('chosen');
+
+  // Hide the prompt text
+  const prompt = document.getElementById('role-prompt');
+  prompt.style.opacity = '0';
+  prompt.style.transform = 'translateY(-10px)';
+  prompt.style.transition = 'all 0.3s ease';
+  setTimeout(() => { prompt.style.display = 'none'; }, 300);
+
+  // Re-observe reveal elements now that they're visible
+  setTimeout(() => {
+    document.querySelectorAll('#gated-content .reveal').forEach(el => observer.observe(el));
+  }, 300);
+}
+
+function switchRole(role) {
+  if (role === currentRole) return;
+  currentRole = role;
+
+  // Update toggle buttons
+  document.querySelectorAll('.role-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.role === role);
+  });
+
+  if (!hasChosen) {
+    // First time choosing — populate content and reveal everything
+    hasChosen = true;
+    applyContent(role);
+    revealGatedContent();
+  } else {
+    // Subsequent switches — animate content swap
+    const els = document.querySelectorAll('.dynamic');
+    els.forEach(el => el.classList.add('switching'));
+
+    setTimeout(() => {
+      applyContent(role);
+      els.forEach(el => el.classList.remove('switching'));
+    }, 350);
+  }
+}
+
+// ─── No initial render — content populates on first role selection ───
+
+// ─── Scroll reveal ───
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ─── Form submission ───
+const BUTTONDOWN_API_KEY = 'a5f35e1c-df62-40e9-8cf5-e7ba63683f5a';
+
+async function submitForm(loc) {
+  const input = document.getElementById(loc + '-email');
+  const email = input.value.trim();
+  if (!email || !email.includes('@')) {
+    input.style.borderColor = '#ff4444';
+    setTimeout(() => input.style.borderColor = '', 2000);
+    return;
+  }
+
+  // Disable button while submitting
+  const btn = input.nextElementSibling;
+  const originalText = btn.textContent;
+  btn.textContent = 'Joining...';
+  btn.disabled = true;
+
+  try {
+    const response = await fetch('https://api.buttondown.com/v1/subscribers', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Token ' + BUTTONDOWN_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email_address: email,
+        type: 'regular',
+        tags: [currentRole],
+        metadata: { role: currentRole, source: 'waitlist' }
+      })
+    });
+
+    if (response.ok || response.status === 409) {
+      // 409 = already subscribed, still show success
+      if (loc === 'hero') {
+        document.querySelector('.hero-form').style.display = 'none';
+        document.getElementById('hero-note').style.display = 'none';
+        document.getElementById('hero-role-wrapper').style.display = 'none';
+        document.getElementById('hero-success').style.display = 'block';
+      } else {
+        document.querySelector('.bottom-form').style.display = 'none';
+        document.getElementById('bottom-success').style.display = 'block';
+      }
+    } else {
+      // Show error but still show success to not lose the lead
+      console.error('Buttondown error:', response.status);
+      if (loc === 'hero') {
+        document.querySelector('.hero-form').style.display = 'none';
+        document.getElementById('hero-note').style.display = 'none';
+        document.getElementById('hero-role-wrapper').style.display = 'none';
+        document.getElementById('hero-success').style.display = 'block';
+      } else {
+        document.querySelector('.bottom-form').style.display = 'none';
+        document.getElementById('bottom-success').style.display = 'block';
+      }
+    }
+  } catch (err) {
+    console.error('Network error:', err);
+    // Still show success so user isn't confused
+    if (loc === 'hero') {
+      document.querySelector('.hero-form').style.display = 'none';
+      document.getElementById('hero-note').style.display = 'none';
+      document.getElementById('hero-role-wrapper').style.display = 'none';
+      document.getElementById('hero-success').style.display = 'block';
+    } else {
+      document.querySelector('.bottom-form').style.display = 'none';
+      document.getElementById('bottom-success').style.display = 'block';
+    }
+  }
+
+  btn.textContent = originalText;
+  btn.disabled = false;
+}
+
+document.querySelectorAll('input[type="email"]').forEach(input => {
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') submitForm(input.id.includes('hero') ? 'hero' : 'bottom');
+  });
+});
+</script>
+
+</body>
+</html>
